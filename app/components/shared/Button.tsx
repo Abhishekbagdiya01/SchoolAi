@@ -17,6 +17,7 @@ export default function Button({
         alignItems: "center",
       }}
       onPress={onPress}
+      disabled={loading}
     >
       {
         !loading ?
@@ -24,7 +25,7 @@ export default function Button({
             fontSize: 22,
             color: type == "fill" ? Colors.WHITE : Colors.PRIMARY
           }}>{text}</Text>
-          : <ActivityIndicator color={type == "fill" ? Colors.WHITE : Colors.PRIMARY}></ActivityIndicator>
+          : <ActivityIndicator size="large" color={type == "fill" ? Colors.WHITE : Colors.PRIMARY}></ActivityIndicator>
       }
     </TouchableOpacity>
   )
