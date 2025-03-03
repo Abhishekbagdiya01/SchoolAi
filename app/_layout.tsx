@@ -1,39 +1,44 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
+import { Stack, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import supabase from "./initSupabase";
+import { StatusBar } from "react-native";
+import { UserDetailContext } from "./context/UserDetailContext";
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [userDetail, setUserDetail] = useState();
+  const router = useRouter();
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
 
-  if (!loaded) {
-    return null;
-  }
+      if (session) {
+        setUser(session.user)
+        const { data, error } = await supabase.from("users").select("*").eq("id", session.user.id).single();
+        if (!error && data) {
+          setUserDetail(data)
+          router.replace("/(tabs)/HomeScreen");
+        }
+      } else {
+        router.replace("./index.tsx")
+      }
+      setLoading(false);
+    };
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+    checkSession();
+  }, []);
+  return <UserDetailContext.Provider value={{
+    userDetail, setUserDetail
+  }}>
+    <StatusBar barStyle="dark-content"></StatusBar>
+    <Stack
+      screenOptions={
+        {
+          headerShown: false
+        }
+      }
+    >
+    </Stack>
+
+  </UserDetailContext.Provider>;
 }
