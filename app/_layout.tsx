@@ -11,7 +11,6 @@ export default function RootLayout() {
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-
       if (session) {
         setUser(session.user)
         const { data, error } = await supabase.from("users").select("*").eq("id", session.user.id).single();

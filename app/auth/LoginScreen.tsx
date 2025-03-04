@@ -1,13 +1,15 @@
 import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Color from '../constant/Color';
 import { useRouter } from 'expo-router';
 import supabase from '../initSupabase';
+import { UserDetailContext } from '../context/UserDetailContext';
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setUserDetail } = useContext(UserDetailContext);
   const login = async () => {
     const {
       data,
@@ -19,8 +21,21 @@ export default function LoginScreen() {
 
     if (error) {
       alert(error.message);
-
+      return;
     }
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+
+    if (userError) {
+      alert('Failed to fetch user details.');
+      console.error('User details fetch error:', userError);
+      return;
+    }
+    setUserDetail(userData);
+    console.log(data, error);
     router.replace("/(tabs)/HomeScreen");
     console.log(
       data, error

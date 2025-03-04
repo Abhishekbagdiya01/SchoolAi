@@ -1,19 +1,20 @@
 import { View, Text, TextInput, Pressable } from 'react-native'
-import React, { createContext, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Colors from '../constant/Color'
 import Button from '../components/shared/Button'
 import { GenerateCourseAIModel, GenerateTopicsAIModel } from '../config/AiModel';
 import Prompt from '../constant/Prompt';
 import supabase from '../initSupabase';
 import { UserDetailContext } from '../context/UserDetailContext';
-
+import { useRouter } from 'expo-router';
 export default function AddCourse() {
   const [loading, setLoading] = useState(false);
   const [courseLoading, setCourseLoading] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [topicIdea, setTopicIdea] = useState([]);
   const [selectedTopics, setSelectedTopics] = useState([]);
-  const [userDetail, setUserDetail] = createContext(UserDetailContext);
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const router = useRouter();
   const onGenerateTopic = async () => {
     try {
       setLoading(true);
@@ -69,7 +70,8 @@ export default function AddCourse() {
       setCourseLoading(true);
       const prompt = selectedTopics + Prompt.COURSE;
       const aiResponse = await GenerateCourseAIModel.sendMessage(prompt);
-      const { courses } = JSON.parse(aiResponse.response.text());
+      const courses = JSON.parse(await aiResponse.response.text());
+      console.log(courses);
 
       for (const course of courses) {
         // Insert course and get ID
@@ -105,7 +107,9 @@ export default function AddCourse() {
 
           // Insert chapter contents
           for (const content of chapter.content) {
-            await supabase.from("chapter_contents").insert({
+            console.log(content);
+
+            const { error } = await supabase.from("contents").insert({
               chapter_id: chapterId,
               topic: content.topic,
               explain: content.explain,
@@ -143,8 +147,8 @@ export default function AddCourse() {
           });
         }
       }
-
       setCourseLoading(false);
+      router.replace("/(tabs)/HomeScreen");
     } catch (error) {
       console.log("Error inserting data:", error);
       setCourseLoading(false);
