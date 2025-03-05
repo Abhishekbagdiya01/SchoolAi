@@ -1,9 +1,10 @@
-import { View, Text, FlatList, Image } from 'react-native'
+import { View, Text, FlatList, Image, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { imageAssets } from '../constant/Option'
 import Colors from '../constant/Color'
 import supabase from '../initSupabase';
 import Feather from '@expo/vector-icons/Feather';
+import { useRouter } from 'expo-router';
 
 export default function CourseList({ courseList }) {
   const [chaptersAndContents, setChaptersAndContents] = useState([]);
@@ -46,6 +47,7 @@ export default function CourseList({ courseList }) {
       fetchCourseDetails()
     }
   }, [courseList])
+  const router = useRouter();
   return (
     <View style={{
       marginTop: 10
@@ -59,7 +61,11 @@ export default function CourseList({ courseList }) {
       <FlatList horizontal={true}
         showsHorizontalScrollIndicator={false}
         data={courseList} renderItem={({ index, item }) => (
-          <View key={index}
+          <TouchableOpacity key={index}
+            onPress={() => router.push({
+              pathname: "./course_view",
+              params: { courseParams: chaptersAndContents[index] }
+            })}
             style={{
               padding: 10,
               backgroundColor: Colors.LIGHTGREY,
@@ -90,7 +96,7 @@ export default function CourseList({ courseList }) {
               <Feather name="book-open" size={20} color="black" />
               <Text>{chaptersAndContents.length}  Chapters</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         )
         } ></FlatList>
 
