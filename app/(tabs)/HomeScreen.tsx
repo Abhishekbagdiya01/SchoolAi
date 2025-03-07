@@ -47,6 +47,8 @@ export default function HomeScreen() {
             <CourseList courseList={courseList} />
           </View>
 
-      }    </View>
+      }
+    </View>
+
   )
 }

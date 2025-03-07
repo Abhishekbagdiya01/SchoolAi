@@ -29,10 +29,10 @@ export default function CourseList({ courseList }) {
 
                 if (contentError) {
                   console.error("Error fetching contents for chapters:", contentError);
-                  return { ...course, chapters: [] }
+                  return { ...chapter, contents: [] }
                 }
 
-                return { ...course, chapters: [] }
+                return { ...chapter, contents }
               })
             );
             return { ...course, chapters: chaptersWithContents }
@@ -55,7 +55,6 @@ export default function CourseList({ courseList }) {
       <Text style={{
         fontSize: 25,
         fontWeight: "bold",
-
       }} >Courses</Text>
 
       <FlatList horizontal={true}
@@ -63,8 +62,8 @@ export default function CourseList({ courseList }) {
         data={courseList} renderItem={({ index, item }) => (
           <TouchableOpacity key={index}
             onPress={() => router.push({
-              pathname: "./course_view",
-              params: { courseParams: chaptersAndContents[index] }
+              pathname: "../course_view/",
+              params: { courseParams: JSON.stringify(chaptersAndContents[index]) }
             })}
             style={{
               padding: 10,

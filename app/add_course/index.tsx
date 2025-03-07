@@ -88,7 +88,10 @@ export default function AddCourse() {
           .select("id")
           .single();
 
-        if (courseError) throw courseError;
+        if (courseError) {
+          console.error("Inserting course error:", courseError);
+          throw courseError;
+        }
         const courseId = courseData.id;
 
         // Insert chapters
