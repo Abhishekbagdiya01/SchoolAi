@@ -119,6 +119,8 @@ export default function AddCourse() {
               code: content.code || null,
               example: content.example || null,
             });
+
+            console.log("Error inserting content:", error);
           }
         }
 
@@ -219,19 +221,19 @@ export default function AddCourse() {
       }}>
         {
           topicIdea.map((topic, index) => (
-            <Pressable style={{
+            <Pressable key={index} style={{
             }}
               onPress={() => onTopicSelected(topic)}
             >
-              <Text key={index} style={{
+              <Text style={{
                 fontSize: 18,
                 padding: 7,
                 borderRadius: 15,
                 borderWidth: 0.4,
                 marginTop: 5,
                 backgroundColor: isTopicSelected(topic) ? Colors.PRIMARY : null,
-                color: isTopicSelected(topic) ? Colors.WHITE : Colors.PRIMARY
-              }}>{topic}</Text>
+                color: isTopicSelected(topic) ? Colors.WHITE : Colors.PRIMARY,
+              }} >{topic}</Text>
             </Pressable>
           ))
         }
